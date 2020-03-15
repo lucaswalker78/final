@@ -14,5 +14,158 @@ before { puts; puts "--------------- NEW REQUEST ---------------"; puts }       
 after { puts; }                                                                       #
 #######################################################################################
 
-events_table = DB.from(:events)
-rsvps_table = DB.from(:rsvps)
+location_table = DB.from(:events)
+reviews_table = DB.from(:rsvps)
+users_table = DB.from(:users)
+
+before do
+    @current_user = users_table.where(id: session["user_id"]).to_a[0]
+end
+
+# homepage and list of events (aka "index")
+get "/" do
+    puts "params: #{params}"
+
+    @location = location_table.all.to_a
+    pp @location
+
+    view "locations"
+end
+
+# event details (aka "show")
+get "/location/:id" do
+    puts "params: #{params}"
+
+    @users_table = users_table
+    @location = location_table.where(id: params[:id]).to_a[0]
+    pp @location
+
+    @reviews = rviews_table.where(event_id: @location[:id]).to_a
+    @reviews_count = reviews_table.where(event_id: @location[:id], worth going to: true).count
+
+    view "event"
+end
+
+# display the reviews form (aka "new")
+get "/events/:id/reviews/new" do
+    puts "params: #{params}"
+
+    @reviews = events_table.where(id: params[:id]).to_a[0]
+    view "new_review"
+end
+
+# receive the submitted rsvp form (aka "create")
+post "/events/:id/rsvps/create" do
+    puts "params: #{params}"
+
+    # first find the event that rsvp'ing for
+    @location = location_table.where(id: params[:id]).to_a[0]
+    # next we want to insert a row in the rsvps table with the rsvp form data
+    rsvps_table.insert(
+        event_id: @location[:id],
+        user_id: session["user_id"],
+        comments: params["comments"],
+        worth going to: params["worth going to"]
+    )
+
+    redirect "/location/#{@location[:id]}"
+end
+
+# display the review form (aka "edit")
+get "/reviews/:id/edit" do
+    puts "params: #{params}"
+
+    @reviews = reviews_table.where(id: params["id"]).to_a[0]
+    @location = location_table.where(id: @location[:event_id]).to_a[0]
+    view "edit_rsvp"
+end
+
+# receive the submitted review form (aka "update")
+post "/rsvps/:id/update" do
+    puts "params: #{params}"
+
+    # find the rsvp to update
+    @reviews = reviews_table.where(id: params["id"]).to_a[0]
+    # find the rsvp's event
+    @location = events_table.where(id: @reviews[:event_id]).to_a[0]
+
+    if @current_user && @current_user[:id] == @reviews[:id]
+        reviews_table.where(id: params["id"]).update(
+            worth going to: params["worth going to"],
+            comments: params["comments"]
+        )
+
+        redirect "/location/#{@location[:id]}"
+    else
+        view "error"
+    end
+end
+
+# delete the review (aka "destroy")
+get "/reviews/:id/destroy" do
+    puts "params: #{params}"
+
+    reviews = reviews_table.where(id: params["id"]).to_a[0]
+    @location = location_table.where(id: rsvp[:event_id]).to_a[0]
+
+    reviews_table.where(id: params["id"]).delete
+
+    redirect "/location/#{@location[:id]}"
+end
+
+# display the signup form (aka "new")
+get "/users/new" do
+    view "new_user"
+end
+
+# receive the submitted signup form (aka "create")
+post "/users/create" do
+    puts "params: #{params}"
+
+    # if there's already a user with this email, skip!
+    existing_user = users_table.where(email: params["email"]).to_a[0]
+    if existing_user
+        view "error"
+    else
+        users_table.insert(
+            name: params["name"],
+            email: params["email"],
+            password: BCrypt::Password.create(params["password"])
+        )
+
+        redirect "/logins/new"
+    end
+end
+
+# display the login form (aka "new")
+get "/logins/new" do
+    view "new_login"
+end
+
+# receive the submitted login form (aka "create")
+post "/logins/create" do
+    puts "params: #{params}"
+
+    # step 1: user with the params["email"] ?
+    @user = users_table.where(email: params["email"]).to_a[0]
+
+    if @user
+        # step 2: if @user, does the encrypted password match?
+        if BCrypt::Password.new(@user[:password]) == params["password"]
+            # set encrypted cookie for logged in user
+            session["user_id"] = @user[:id]
+            redirect "/"
+        else
+            view "create_login_failed"
+        end
+    else
+        view "create_login_failed"
+    end
+end
+
+# logout user
+get "/logout" do
+    # remove encrypted cookie for logged out user
+    session["user_id"] = nil
+    redirect "/logins/new"
+end
