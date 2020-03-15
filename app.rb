@@ -14,8 +14,8 @@ before { puts; puts "--------------- NEW REQUEST ---------------"; puts }       
 after { puts; }                                                                       #
 #######################################################################################
 
-location_table = DB.from(:events)
-reviews_table = DB.from(:rsvps)
+location_table = DB.from(:location)
+reviews_table = DB.from(:reviews)
 users_table = DB.from(:users)
 
 before do
@@ -40,32 +40,32 @@ get "/location/:id" do
     @location = location_table.where(id: params[:id]).to_a[0]
     pp @location
 
-    @reviews = rviews_table.where(event_id: @location[:id]).to_a
-    @reviews_count = reviews_table.where(event_id: @location[:id], worth going to: true).count
+    @reviews = reviews_table.where(location_id: @location[:id]).to_a
+    @reviews_count = reviews_table.where(location_id: @location[:id], worth_going_to: true).count
 
-    view "event"
+    view "location"
 end
 
 # display the reviews form (aka "new")
-get "/events/:id/reviews/new" do
+get "/location/:id/reviews/new" do
     puts "params: #{params}"
 
-    @reviews = events_table.where(id: params[:id]).to_a[0]
+    @reviews = location_table.where(id: params[:id]).to_a[0]
     view "new_review"
 end
 
 # receive the submitted rsvp form (aka "create")
-post "/events/:id/rsvps/create" do
+post "/location/:id/reviews/create" do
     puts "params: #{params}"
 
     # first find the event that rsvp'ing for
     @location = location_table.where(id: params[:id]).to_a[0]
     # next we want to insert a row in the rsvps table with the rsvp form data
-    rsvps_table.insert(
+    reviews_table.insert(
         event_id: @location[:id],
         user_id: session["user_id"],
         comments: params["comments"],
-        worth going to: params["worth going to"]
+        worth_going_to: params["worth_going_to"]
     )
 
     redirect "/location/#{@location[:id]}"
@@ -77,17 +77,17 @@ get "/reviews/:id/edit" do
 
     @reviews = reviews_table.where(id: params["id"]).to_a[0]
     @location = location_table.where(id: @location[:event_id]).to_a[0]
-    view "edit_rsvp"
+    view "edit_review"
 end
 
 # receive the submitted review form (aka "update")
-post "/rsvps/:id/update" do
+post "/reviews/:id/update" do
     puts "params: #{params}"
 
     # find the rsvp to update
     @reviews = reviews_table.where(id: params["id"]).to_a[0]
     # find the rsvp's event
-    @location = events_table.where(id: @reviews[:event_id]).to_a[0]
+    @location = locatioon_table.where(id: @reviews[:event_id]).to_a[0]
 
     if @current_user && @current_user[:id] == @reviews[:id]
         reviews_table.where(id: params["id"]).update(
@@ -106,7 +106,7 @@ get "/reviews/:id/destroy" do
     puts "params: #{params}"
 
     reviews = reviews_table.where(id: params["id"]).to_a[0]
-    @location = location_table.where(id: rsvp[:event_id]).to_a[0]
+    @location = location_table.where(id: reviews[:event_id]).to_a[0]
 
     reviews_table.where(id: params["id"]).delete
 

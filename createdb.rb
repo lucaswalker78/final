@@ -14,9 +14,17 @@ end
 DB.create_table! :reviews do
   primary_key :id
   foreign_key :location_id
-  Boolean :worth going to
+  Boolean :worth_going_to
   String :name
   String :comments, text: true
+end
+
+DB.create_table! :users do
+  primary_key :id
+  foreign_key :reviews_id
+  String :name
+  String :email
+  String :password
 end
 
 # Insert initial (seed) data
@@ -26,6 +34,6 @@ location_table.insert(name: "Hangge Uppe",
                     description: "Three Floor bar open until 5 am",
                     neighborhood: "Old Town")
 
-location_table.insert(title: "Bub City", 
+location_table.insert(name: "Bub City", 
                     description: "Country bar with barebeque and live music.",
                     neighborhood: "River North")
