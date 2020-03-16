@@ -6,7 +6,9 @@
         </h2>
         <h1><%= @location[:name] %></h1>
         <p><%= @location[:description] %></p>
-
+        <p><b> Do people think <%= @location[:name] %> is worth going to?</b></p>
+        
+        <h3>Detailed Reviews</h3>
         <% for reviews in @reviews %>
             <div class="media">
                 <% if reviews[:worth_going_to] %>
@@ -16,12 +18,12 @@
                 <% end %>
                 <div class="media-body">
                     <h5 class="mt-0">
-                        <%= @users_table.where(id: rsvp[:user_id]).to_a[0][:name] %>
+                        <%= @users_table.where(id: reviews[:user_id]).to_a[0][:name] %>
 
                         <small>
                             <!-- only show these links if it's my rsvp -->
                             <% if @current_user && @current_user[:id] == reviews[:user_id] %>
-                                (<a href="/reviews/<%= reviews[:id] %>/edit">edit</a> | <a href="/reviews/<%= reviews[:id] %>/destroy">delete</a>)
+                                (<a href="/review/<%= reviews[:id] %>/edit">edit</a> | <a href="/review/<%= reviews[:id] %>/destroy">delete</a>)
                             <% end %>
                         </small>
                     </h5>
@@ -42,7 +44,7 @@
         <p><%= @location[:style] %></p>
         <h3>Where?</h3>
         <p><%= @location[:neighborhood] %></p>
-        <h3>How many reviews?</h3>
+        <h3>How many people think <%= @location[:name] %> is worth going to?</h3>
         <p><%= @reviews_count %></p>
     </div>
 </div>

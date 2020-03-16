@@ -75,8 +75,8 @@ end
 get "/review/:id/edit" do
     puts "params: #{params}"
 
-    @reviews = reviews_table.where(id: params["id"]).to_a[0]
-    @location = location_table.where(id: @location[:event_id]).to_a[0]
+    review = reviews_table.where(id: params["id"]).to_a[0]
+    @location = location_table.where(id: review[:location_id]).to_a[0]
     view "edit_review"
 end
 
@@ -85,13 +85,13 @@ post "/review/:id/update" do
     puts "params: #{params}"
 
     # find the rsvp to update
-    @reviews = reviews_table.where(id: params["id"]).to_a[0]
+    @review = reviews_table.where(id: params["id"]).to_a[0]
     # find the rsvp's event
-    @location = locatioon_table.where(id: @reviews[:event_id]).to_a[0]
+    @location = location_table.where(id: @review[:location_id]).to_a[0]
 
     if @current_user && @current_user[:id] == @reviews[:id]
         reviews_table.where(id: params["id"]).update(
-            worth going to: params["worth going to"],
+            worth_going_to: params["worth_going_to"],
             comments: params["comments"]
         )
 
@@ -105,8 +105,8 @@ end
 get "/review/:id/destroy" do
     puts "params: #{params}"
 
-    reviews = reviews_table.where(id: params["id"]).to_a[0]
-    @location = location_table.where(id: reviews[:event_id]).to_a[0]
+    review = reviews_table.where(id: params["id"]).to_a[0]
+    @location = location_table.where(id: review[:location_id]).to_a[0]
 
     reviews_table.where(id: params["id"]).delete
 
