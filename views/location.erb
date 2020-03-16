@@ -1,8 +1,8 @@
 <div class="row">
     <div class="col-sm-9">
         <h2>
-            <i class="far fa-calendar-alt"></i>
-            <%= @event[:date] %>
+            <i class="fas fa-globe"></i>
+            <%= @location[:neighborhood] %>
         </h2>
         <h1><%= @location[:name] %></h1>
         <p><%= @location[:description] %></p>
@@ -31,18 +31,18 @@
         <% end %>
         <p class="mt-5">
             <% if @current_user %>
-                <a href="/location/<%= @location[:id] %>/reviews/new" class="btn btn-primary">Review Now!</a>
+                <a href="/location/<%= @location[:id] %>/review/new" class="btn btn-primary">Review Now!</a>
             <% else %>
                 <a href="/logins/new" class="btn btn-danger">Please sign in to review</a>
             <% end %>
         </p>
     </div>
     <div class="col-sm-3">
-        <h3>When?</h3>
-        <p><%= @event[:date] %></p>
+        <h3>Style?</h3>
+        <p><%= @location[:style] %></p>
         <h3>Where?</h3>
         <p><%= @location[:neighborhood] %></p>
-        <h3>How many positive reviews?</h3>
+        <h3>How many reviews?</h3>
         <p><%= @reviews_count %></p>
     </div>
 </div>

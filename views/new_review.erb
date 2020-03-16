@@ -1,0 +1,17 @@
+<h1>Review for <%= @location[:name] %></h1>
+
+<form action="/location/<%= @location[:id] %>/review/create" method="post">
+  <div class="form-group">
+    <label>Is <%= @location[:name] %> Worth Going to?</label>
+    <select class="form-control" name="going">
+      <option value="1">Yes</option>
+      <option value="0">No</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Comments</label>
+    <textarea class="form-control" rows="3" name="comments"></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>

@@ -9,11 +9,13 @@ DB.create_table! :location do
   primary_key :id
   String :name
   String :description, text: true
+  String :style
   String :neighborhood
 end
 DB.create_table! :reviews do
   primary_key :id
   foreign_key :location_id
+  foreign_key :user_id
   Boolean :worth_going_to
   String :name
   String :comments, text: true
@@ -31,9 +33,11 @@ end
 location_table = DB.from(:location)
 
 location_table.insert(name: "Hangge Uppe", 
-                    description: "Three Floor bar open until 5 am",
+                    description: "Three floor bar, open until 5 am",
+                    style: "Bar",
                     neighborhood: "Old Town")
 
 location_table.insert(name: "Bub City", 
-                    description: "Country bar with barebeque and live music.",
+                    description: "Country restaurant and bar with barebeque and live music.",
+                    style: "Restaurant",
                     neighborhood: "River North")

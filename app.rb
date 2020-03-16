@@ -47,22 +47,22 @@ get "/location/:id" do
 end
 
 # display the reviews form (aka "new")
-get "/location/:id/reviews/new" do
+get "/location/:id/review/new" do
     puts "params: #{params}"
 
-    @reviews = location_table.where(id: params[:id]).to_a[0]
+    @location = location_table.where(id: params[:id]).to_a[0]
     view "new_review"
 end
 
 # receive the submitted rsvp form (aka "create")
-post "/location/:id/reviews/create" do
+post "/location/:id/review/create" do
     puts "params: #{params}"
 
     # first find the event that rsvp'ing for
     @location = location_table.where(id: params[:id]).to_a[0]
     # next we want to insert a row in the rsvps table with the rsvp form data
     reviews_table.insert(
-        event_id: @location[:id],
+        location_id: @location[:id],
         user_id: session["user_id"],
         comments: params["comments"],
         worth_going_to: params["worth_going_to"]
@@ -72,7 +72,7 @@ post "/location/:id/reviews/create" do
 end
 
 # display the review form (aka "edit")
-get "/reviews/:id/edit" do
+get "/review/:id/edit" do
     puts "params: #{params}"
 
     @reviews = reviews_table.where(id: params["id"]).to_a[0]
@@ -81,7 +81,7 @@ get "/reviews/:id/edit" do
 end
 
 # receive the submitted review form (aka "update")
-post "/reviews/:id/update" do
+post "/review/:id/update" do
     puts "params: #{params}"
 
     # find the rsvp to update
@@ -102,7 +102,7 @@ post "/reviews/:id/update" do
 end
 
 # delete the review (aka "destroy")
-get "/reviews/:id/destroy" do
+get "/review/:id/destroy" do
     puts "params: #{params}"
 
     reviews = reviews_table.where(id: params["id"]).to_a[0]
