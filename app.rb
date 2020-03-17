@@ -19,11 +19,11 @@ reviews_table = DB.from(:reviews)
 users_table = DB.from(:users)
 
 # put your API credentials here (found on your Twilio dashboard)
-account_sid = "ACa1200c0403272111d721df37d50e1195"
-auth_token = "e4a0f683eef359b946eb2bf492a05261"
+account_sid = ENV["Taco"]
+auth_token = ENV["Pizza"]
 
 # set up a client to talk to the Twilio REST API
-client = Twilio::REST::Client.new(ACa1200c0403272111d721df37d50e1195, e4a0f683eef359b946eb2bf492a05261)
+client = Twilio::REST::Client.new(account_sid, auth_token)
 
 before do
     @current_user = users_table.where(id: session["user_id"]).to_a[0]
