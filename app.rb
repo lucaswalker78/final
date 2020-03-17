@@ -18,6 +18,13 @@ location_table = DB.from(:location)
 reviews_table = DB.from(:reviews)
 users_table = DB.from(:users)
 
+# put your API credentials here (found on your Twilio dashboard)
+account_sid = "ACa1200c0403272111d721df37d50e1195"
+auth_token = "e4a0f683eef359b946eb2bf492a05261"
+
+# set up a client to talk to the Twilio REST API
+client = Twilio::REST::Client.new(ACa1200c0403272111d721df37d50e1195, e4a0f683eef359b946eb2bf492a05261)
+
 before do
     @current_user = users_table.where(id: session["user_id"]).to_a[0]
 end
@@ -115,6 +122,13 @@ end
 
 # display the signup form (aka "new")
 get "/users/new" do
+
+    # send the SMS from your trial Twilio number to your verified non-Twilio number
+    client.messages.create(
+    from: "++15097743115", 
+    to: "+16176992580",
+    body: "A New User is Signing Up!"
+    )
     view "new_user"
 end
 
@@ -132,7 +146,7 @@ post "/users/create" do
             email: params["email"],
             password: BCrypt::Password.create(params["password"])
         )
-
+      
         redirect "/logins/new"
     end
 end
