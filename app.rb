@@ -78,15 +78,6 @@ post "/location/:id/review/create" do
     redirect "/location/#{@location[:id]}"
 end
 
-# display the review form (aka "edit")
-get "/review/:id/edit" do
-    puts "params: #{params}"
-
-    review = reviews_table.where(id: params["id"]).to_a[0]
-    @location = location_table.where(id: review[:location_id]).to_a[0]
-    view "edit_review"
-end
-
 # receive the submitted review form (aka "update")
 post "/review/:id/update" do
     puts "params: #{params}"

@@ -23,7 +23,7 @@
                         <small>
                             <!-- only show these links if it's my rsvp -->
                             <% if @current_user && @current_user[:id] == reviews[:user_id] %>
-                                (<a href="/review/<%= reviews[:id] %>/edit">edit</a> | <a href="/review/<%= reviews[:id] %>/destroy">delete</a>)
+                                (<a href="/review/<%= reviews[:id] %>/destroy">delete</a>)
                             <% end %>
                         </small>
                     </h5>
